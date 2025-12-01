@@ -59,4 +59,4 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           chmod +x .github/scripts/create-discussion.sh
-          .github/scripts/create-discussion.sh "${{ steps.new-themes.outputs.themes }}" "${{ steps.repo-id.outputs.node_id }}" "${{ vars.DISCUSSION_CATEGORY_ID }}"
+          .github/scripts/create-discussion.sh "${{ steps.new-themes.outputs.themes }}" "${{ steps.repo-id.outputs.node_id }}" "${{ secrets.DISCUSSION_CATEGORY_ID }}"
