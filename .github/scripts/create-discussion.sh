@@ -17,7 +17,15 @@ for REPO in $NEW_THEMES; do
   fi
 
   TITLE=$(echo "$METADATA" | jq -r '.title // "Unknown Theme"')
-  DESCRIPTION=$(echo "$METADATA" | jq -r '.description // "No description provided"')
+
+  # Try to fetch DESCRIPTION.md first, fall back to metadata.json description
+  DESCRIPTION_MD=$(gh api "repos/${REPO}/contents/DESCRIPTION.md" --jq '.content' 2>/dev/null | base64 -d 2>/dev/null || echo "")
+  if [ -n "$DESCRIPTION_MD" ]; then
+    DESCRIPTION="$DESCRIPTION_MD"
+  else
+    DESCRIPTION=$(echo "$METADATA" | jq -r '.description // "No description provided"')
+  fi
+
   CREATORS=$(echo "$METADATA" | jq -r '.creators | join(", ") // "Unknown"')
   VERSION=$(echo "$METADATA" | jq -r '.version // "1.0.0"')
   TAGS=$(echo "$METADATA" | jq -r 'if .tags then .tags | join(", ") else "" end')

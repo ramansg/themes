@@ -30,11 +30,12 @@ Your theme repo must include these files:
 
 ```
 your-theme-repo/
-├── metadata.json   # Theme info (required)
-├── style.css       # Your CSS (required)
-├── cover.png       # Cover image (optional - first image used if missing)
-├── shader.json     # Shader config (optional)
-└── images/         # Screenshots (required - at least one)
+├── metadata.json    # Theme info (required)
+├── style.css        # Your CSS (required)
+├── DESCRIPTION.md   # Rich description (optional - takes precedence over metadata.json)
+├── cover.png        # Cover image (optional - first image used if missing)
+├── shader.json      # Shader config (optional)
+└── images/          # Screenshots (required - at least one)
     ├── 1.png
     └── 2.png
 ```
@@ -59,7 +60,7 @@ your-theme-repo/
 | ----------- | -------- | --------------------------------------------------------------------------- |
 | id          | Yes      | Unique identifier (lowercase, hyphens allowed)                              |
 | title       | Yes      | Display name                                                                |
-| description | Yes      | What your theme does                                                        |
+| description | \*       | What your theme does (\*required unless DESCRIPTION.md exists)              |
 | creators    | Yes      | Array of GitHub usernames                                                   |
 | minVersion  | Yes      | Minimum Better Lyrics version required                                      |
 | hasShaders  | Yes      | Whether theme includes shader.json                                          |
@@ -67,7 +68,32 @@ your-theme-repo/
 | tags        | No       | Searchable tags                                                             |
 | images      | Yes      | Filenames in the images/ folder (first image used as cover if no cover.png) |
 
-### 3. Submit a Pull Request
+### 3. (Optional) Create `DESCRIPTION.md`
+
+For richer descriptions with markdown formatting, create a `DESCRIPTION.md` file in your repo root:
+
+```markdown
+A beautiful dark theme with smooth animations.
+
+## Features
+
+- Custom gradient backgrounds
+- Smooth lyric transitions
+- **Rich sync** word-by-word highlighting
+
+## Installation Notes
+
+This theme works best with the album art background enabled.
+```
+
+**Benefits:**
+- Full markdown support with headers, lists, images, and more
+- GitHub renders the file nicely in your repo
+- Easier to maintain longer descriptions
+
+**Note:** If both `DESCRIPTION.md` and the `description` field in `metadata.json` exist, `DESCRIPTION.md` takes precedence.
+
+### 4. Submit a Pull Request
 
 1. Fork this repository
 2. Add your theme to `index.json`:
