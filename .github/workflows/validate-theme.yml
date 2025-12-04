@@ -198,15 +198,54 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
+      - name: Collect existing theme IDs
+        id: existing-ids
+        run: |
+          EXISTING_IDS=""
+          if [ -f index.json ] && jq empty index.json 2>/dev/null; then
+            while IFS= read -r repo; do
+              [ -z "$repo" ] && continue
+              git clone --depth 1 "https://github.com/$repo.git" existing-theme 2>/dev/null || continue
+              if [ -f "existing-theme/metadata.json" ]; then
+                ID=$(jq -r '.id // empty' existing-theme/metadata.json)
+                if [ -n "$ID" ]; then
+                  EXISTING_IDS="$EXISTING_IDS$ID\n"
+                fi
+              fi
+              rm -rf existing-theme
+            done < <(jq -r '.themes[].repo' index.json)
+          fi
+          echo "ids<<EOF" >> $GITHUB_OUTPUT
+          echo -e "$EXISTING_IDS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Check for duplicate theme ID
+        run: |
+          echo "Checking for duplicate ID: ${{ inputs.theme }}"
+
+          git clone --depth 1 "https://github.com/${{ inputs.theme }}.git" theme-repo
+
+          EXISTING_IDS="${{ steps.existing-ids.outputs.ids }}"
+
+          if [ -f "theme-repo/metadata.json" ]; then
+            THEME_ID=$(jq -r '.id // empty' theme-repo/metadata.json)
+            if [ -n "$THEME_ID" ] && echo -e "$EXISTING_IDS" | grep -qx "$THEME_ID"; then
+              echo "Error: Duplicate theme ID - '$THEME_ID' already exists in another theme."
+              exit 1
+            fi
+            echo "No duplicate ID found for '$THEME_ID'"
+          fi
+
       - name: Validate theme
         run: |
           echo "Validating: ${{ inputs.theme }}"
-
-          git clone --depth 1 "https://github.com/${{ inputs.theme }}.git" theme-repo
 
           npx create-bl-theme@latest validate theme-repo
