@@ -1,8 +1,16 @@
 {
   "themes": [
-    { "repo": "boidushya/apple-music" },
-    { "repo": "ramansg/Minimal" },
-    { "repo": "tposejank/blyrics-am-theme" },
-    { "repo": "adaliea/blyrics-colorful-vocals" }
+    {
+      "repo": "boidushya/apple-music"
+    },
+    {
+      "repo": "ramansg/Minimal"
+    },
+    {
+      "repo": "tposejank/blyrics-am-theme"
+    },
+    {
+      "repo": "adaliea/blyrics-colorful-vocals"
+    }
   ]
 }
