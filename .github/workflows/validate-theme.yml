@@ -37,12 +37,22 @@ jobs:
             echo "changed=true" >> $GITHUB_OUTPUT
           fi
 
+      - name: Generate App Token for commits
+        id: app-token-commit
+        if: steps.format.outputs.changed == 'true'
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
       - name: Commit formatting
         if: steps.format.outputs.changed == 'true'
         continue-on-error: true
+        env:
+          GH_TOKEN: ${{ steps.app-token-commit.outputs.token }}
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "better-lyrics-themes[bot]"
+          git config user.email "better-lyrics-themes[bot]@users.noreply.github.com"
           git add index.json
           git commit -m "chore: format index.json"
           git push
@@ -227,11 +237,22 @@ jobs:
           echo -e "$VENDORED_THEMES" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
+      - name: Generate App Token for vendor commit
+        id: app-token-vendor
+        if: steps.vendor.outputs.vendored != ''
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
       - name: Commit vendored themes
         if: steps.vendor.outputs.vendored != ''
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ steps.app-token-vendor.outputs.token }}
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "better-lyrics-themes[bot]"
+          git config user.email "better-lyrics-themes[bot]@users.noreply.github.com"
           git add themes/ index.lock.json
           git commit -m "chore: vendor new themes"
           git push
