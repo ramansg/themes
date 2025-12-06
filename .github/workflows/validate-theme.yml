@@ -53,6 +53,7 @@ jobs:
         run: |
           git config user.name "better-lyrics-harmonizer[bot]"
           git config user.email "2418247+better-lyrics-harmonizer[bot]@users.noreply.github.com"
+          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${{ github.event.pull_request.head.repo.full_name }}.git"
           git add index.json
           git commit -m "chore: format index.json"
           git push
@@ -280,6 +281,7 @@ jobs:
         run: |
           git config user.name "better-lyrics-harmonizer[bot]"
           git config user.email "2418247+better-lyrics-harmonizer[bot]@users.noreply.github.com"
+          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${{ github.event.pull_request.head.repo.full_name }}.git"
           git add themes/ index.lock.json
 
           # Build commit message
@@ -338,7 +340,13 @@ jobs:
               body += '### Removed Themes\n\n';
               body += removed.split('\n').filter(Boolean).map(t => `- ${t}`).join('\n') + '\n\n';
             }
-            body += hasErrors ? 'Please fix the errors above.' : 'All checks passed.';
+            if (hasErrors) {
+              body += 'Please fix the errors above.';
+            } else {
+              body += 'All checks passed.\n\n';
+              body += '---\n\n';
+              body += '**Enable auto-updates:** [Install Better Lyrics Harmonizer](https://github.com/apps/better-lyrics-harmonizer/installations/new) on your theme repo to automatically publish future updates when you push.';
+            }
 
             await github.rest.issues.createComment({
               owner: context.repo.owner,

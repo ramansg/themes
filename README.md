@@ -1,5 +1,11 @@
 # Better Lyrics Theme Store
 
+[![Install Better Lyrics Harmonizer](https://img.shields.io/badge/Install-Better%20Lyrics%20Harmonizer-blue?logo=github)](https://github.com/apps/better-lyrics-harmonizer/installations/new)
+[![Themes](https://badgen.net/https/raw.githubusercontent.com/better-lyrics/themes/master/index.json/themes/length?label=themes)](https://github.com/better-lyrics/themes)
+[![Last Updated](https://badgen.net/github/last-commit/better-lyrics/themes)](https://github.com/better-lyrics/themes/commits)
+[![Discord](https://badgen.net/badge/icon/discord?icon=discord&label)](https://discord.gg/UsHE3d5fWF)
+[![License](https://badgen.net/badge/license/MIT/blue)](https://github.com/better-lyrics/themes/blob/master/LICENSE)
+
 Community themes for [Better Lyrics](https://github.com/better-lyrics/better-lyrics).
 
 ## Browse Themes
@@ -87,6 +93,7 @@ This theme works best with the album art background enabled.
 ```
 
 **Benefits:**
+
 - Full markdown support with headers, lists, images, and more
 - GitHub renders the file nicely in your repo
 - Easier to maintain longer descriptions
@@ -108,6 +115,14 @@ This theme works best with the album art background enabled.
 ```
 
 3. Open a pull request
+
+### 5. Enable Auto-Updates (Recommended)
+
+Install the GitHub App to automatically publish updates when you push:
+
+[![Install Better Lyrics Harmonizer](https://img.shields.io/badge/Install-Better%20Lyrics%20Harmonizer-blue?logo=github)](https://github.com/apps/better-lyrics-harmonizer/installations/new)
+
+Once installed, just bump the `version` in your `metadata.json` and push - your theme updates automatically!
 
 ## Guidelines
 
