@@ -2,20 +2,10 @@
   "id": "apple-music-test",
   "title": "Apple Music",
   "description": "It appl music",
-  "creators": [
-    "boidushya"
-  ],
+  "creators": ["boidushya"],
   "minVersion": "2.0.5.6",
   "hasShaders": true,
-  "version": "1.1.11",
-  "tags": [
-    "dark",
-    "minimal",
-    "colorful"
-  ],
-  "images": [
-    "1.png",
-    "2.png",
-    "3.png"
-  ]
+  "version": "1.1.12",
+  "tags": ["dark", "minimal", "colorful"],
+  "images": ["1.png", "2.png", "3.png"]
 }
