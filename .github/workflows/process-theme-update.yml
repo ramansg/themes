@@ -3,9 +3,18 @@ name: Process Theme Update
 on:
   repository_dispatch:
     types: [theme-update]
+  push:
+    branches: [master]
+    paths: ['index.json']
+
+concurrency:
+  group: theme-vendoring
+  cancel-in-progress: false
 
 jobs:
+  # Job for repository_dispatch events (theme updates from harmonizer)
   update:
+    if: github.event_name == 'repository_dispatch'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -190,3 +199,240 @@ jobs:
               "description": "${{ steps.check-registered.outputs.error || steps.version-check.outputs.error || steps.validate.outputs.error || 'Update failed' }}",
               "targetUrl": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
             }'
+
+  # Job for push events (new themes added via PR merge)
+  vendor-new:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Generate App Token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Get theme changes
+        id: changes
+        run: |
+          # Get repos from index.json
+          jq -r '.themes[].repo' index.json | sort > index_repos.txt
+
+          # Get repos from lockfile
+          if [ -f index.lock.json ] && jq empty index.lock.json 2>/dev/null; then
+            jq -r '.themes[].repo' index.lock.json | sort > lock_repos.txt
+          else
+            touch lock_repos.txt
+          fi
+
+          # Find new themes (in index.json but not in lockfile)
+          NEW_THEMES=$(comm -23 index_repos.txt lock_repos.txt)
+
+          # Find removed themes (in lockfile but not in index.json)
+          REMOVED_THEMES=$(comm -13 index_repos.txt lock_repos.txt)
+
+          echo "new<<EOF" >> $GITHUB_OUTPUT
+          echo "$NEW_THEMES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+          echo "removed<<EOF" >> $GITHUB_OUTPUT
+          echo "$REMOVED_THEMES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+          if [ -n "$NEW_THEMES" ]; then
+            echo "New themes to vendor:"
+            echo "$NEW_THEMES"
+          fi
+
+          if [ -n "$REMOVED_THEMES" ]; then
+            echo "Themes to remove:"
+            echo "$REMOVED_THEMES"
+          fi
+
+      - name: Vendor new themes
+        id: vendor
+        if: steps.changes.outputs.new != ''
+        run: |
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          VENDORED=""
+          FAILED=""
+
+          # Initialize lockfile if it doesn't exist
+          if [ ! -f index.lock.json ]; then
+            echo '{"version":1,"updated":"'"$TIMESTAMP"'","themes":[]}' > index.lock.json
+          fi
+
+          while IFS= read -r repo; do
+            [ -z "$repo" ] && continue
+            echo "Vendoring: $repo"
+
+            if ! git clone --depth 1 "https://github.com/$repo.git" theme-repo 2>&1; then
+              echo "::error::Failed to clone $repo"
+              FAILED="$FAILED$repo\n"
+              continue
+            fi
+
+            cd theme-repo
+            COMMIT=$(git rev-parse HEAD)
+            cd ..
+
+            THEME_ID=$(jq -r '.id' theme-repo/metadata.json)
+            VERSION=$(jq -r '.version' theme-repo/metadata.json)
+
+            # Validate theme
+            OUTPUT=$(NO_COLOR=1 npx create-bl-theme@latest validate theme-repo 2>&1 | sed 's/\x1b\[[0-9;]*m//g')
+            echo "$OUTPUT"
+
+            if echo "$OUTPUT" | grep -qi "error\|failed"; then
+              echo "::error::Validation failed for $repo"
+              FAILED="$FAILED$repo\n"
+              rm -rf theme-repo
+              continue
+            fi
+
+            # Create vendor directory
+            rm -rf "themes/$THEME_ID"
+            mkdir -p "themes/$THEME_ID"
+
+            # Copy essential files
+            cp theme-repo/metadata.json "themes/$THEME_ID/"
+            [ -f theme-repo/style.rics ] && cp theme-repo/style.rics "themes/$THEME_ID/"
+            [ -f theme-repo/style.css ] && cp theme-repo/style.css "themes/$THEME_ID/"
+            [ -f theme-repo/shader.json ] && cp theme-repo/shader.json "themes/$THEME_ID/"
+            [ -f theme-repo/DESCRIPTION.md ] && cp theme-repo/DESCRIPTION.md "themes/$THEME_ID/"
+            [ -f theme-repo/cover.png ] && cp theme-repo/cover.png "themes/$THEME_ID/"
+            [ -d theme-repo/images ] && cp -r theme-repo/images "themes/$THEME_ID/"
+
+            # Calculate integrity hash
+            INTEGRITY=$(find "themes/$THEME_ID" -type f -exec sha256sum {} \; | sort | sha256sum | cut -d' ' -f1)
+
+            # Add to lockfile
+            jq --arg repo "$repo" --arg id "$THEME_ID" --arg v "$VERSION" \
+               --arg c "$COMMIT" --arg i "sha256-$INTEGRITY" --arg t "$TIMESTAMP" \
+               '.themes += [{repo: $repo, id: $id, version: $v, commit: $c, integrity: $i, locked: $t}] | .updated = $t' \
+               index.lock.json > tmp.json && mv tmp.json index.lock.json
+
+            VENDORED="$VENDORED$THEME_ID (v$VERSION)\n"
+
+            rm -rf theme-repo
+          done <<< "${{ steps.changes.outputs.new }}"
+
+          # Format lockfile
+          jq -S '.' index.lock.json > tmp.json && mv tmp.json index.lock.json
+
+          echo "vendored<<EOF" >> $GITHUB_OUTPUT
+          echo -e "$VENDORED" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+          echo "failed<<EOF" >> $GITHUB_OUTPUT
+          echo -e "$FAILED" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+          # Fail if any themes failed to vendor
+          if [ -n "$FAILED" ]; then
+            echo "::error::Some themes failed to vendor"
+            exit 1
+          fi
+
+      - name: Remove old themes
+        id: cleanup
+        if: steps.changes.outputs.removed != ''
+        run: |
+          REMOVED=""
+
+          while IFS= read -r repo; do
+            [ -z "$repo" ] && continue
+            echo "Removing: $repo"
+
+            # Find theme ID from lockfile
+            THEME_ID=$(jq -r --arg repo "$repo" '.themes[] | select(.repo == $repo) | .id' index.lock.json)
+
+            if [ -n "$THEME_ID" ] && [ "$THEME_ID" != "null" ]; then
+              # Remove vendored files
+              if [ -d "themes/$THEME_ID" ]; then
+                rm -rf "themes/$THEME_ID"
+                echo "Removed themes/$THEME_ID"
+              fi
+
+              # Remove from lockfile
+              jq --arg repo "$repo" '.themes = [.themes[] | select(.repo != $repo)]' index.lock.json > tmp.json && mv tmp.json index.lock.json
+
+              REMOVED="$REMOVED$THEME_ID\n"
+            fi
+          done <<< "${{ steps.changes.outputs.removed }}"
+
+          # Format lockfile
+          jq -S '.' index.lock.json > tmp.json && mv tmp.json index.lock.json
+
+          echo "removed<<EOF" >> $GITHUB_OUTPUT
+          echo -e "$REMOVED" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      # https://github.com/planetscale/ghcommit-action/issues/43#issuecomment-2313129696
+      - name: Stage all changes
+        id: stage
+        if: steps.vendor.outputs.vendored != '' || steps.cleanup.outputs.removed != ''
+        run: |
+          git add .
+          git diff --staged --quiet || echo "has_changes=true" >> $GITHUB_OUTPUT
+
+      - name: Commit and push changes
+        if: steps.stage.outputs.has_changes == 'true'
+        uses: planetscale/ghcommit-action@v0.2.19
+        with:
+          commit_message: "chore: vendor themes [skip ci]"
+          repo: ${{ github.repository }}
+          branch: master
+        env:
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## Theme Vendoring Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          VENDORED="${{ steps.vendor.outputs.vendored }}"
+          REMOVED="${{ steps.cleanup.outputs.removed }}"
+          FAILED="${{ steps.vendor.outputs.failed }}"
+
+          if [ -n "$VENDORED" ]; then
+            echo "### Vendored Themes" >> $GITHUB_STEP_SUMMARY
+            echo "$VENDORED" | while IFS= read -r theme; do
+              [ -n "$theme" ] && echo "- $theme" >> $GITHUB_STEP_SUMMARY
+            done
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [ -n "$REMOVED" ]; then
+            echo "### Removed Themes" >> $GITHUB_STEP_SUMMARY
+            echo "$REMOVED" | while IFS= read -r theme; do
+              [ -n "$theme" ] && echo "- $theme" >> $GITHUB_STEP_SUMMARY
+            done
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [ -n "$FAILED" ]; then
+            echo "### Failed Themes" >> $GITHUB_STEP_SUMMARY
+            echo "$FAILED" | while IFS= read -r theme; do
+              [ -n "$theme" ] && echo "- $theme" >> $GITHUB_STEP_SUMMARY
+            done
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [ -z "$VENDORED" ] && [ -z "$REMOVED" ] && [ -z "$FAILED" ]; then
+            echo "No theme changes detected." >> $GITHUB_STEP_SUMMARY
+          fi
