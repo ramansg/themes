@@ -33,14 +33,14 @@
       "version": "1.0.0"
     },
     {
-      "commit": "9a8ac20b82e276724a6bae1a476298dc9dff669d",
+      "commit": "ce5997edcf5c42d07c426f7f7499bc5ac99c9d32",
       "id": "recover-theme",
-      "integrity": "sha256-67e8605bb7e4196be33a9670ded122e3c51e0ec546fc3650eb2c4b744504708c",
-      "locked": "2025-12-29T05:46:23Z",
+      "integrity": "sha256-9e9324643a030defecb7ac7ed11e98c8509d2184508bbfc394f402cd60557ddf",
+      "locked": "2025-12-30T09:19:34Z",
       "repo": "mukeenanyafiq/recover-theme",
-      "version": "1.0.3"
+      "version": "1.0.4"
     }
   ],
-  "updated": "2025-12-29T05:46:23Z",
+  "updated": "2025-12-30T09:19:34Z",
   "version": 1
 }
