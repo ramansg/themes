@@ -31,8 +31,16 @@
       "locked": "2026-01-11T02:50:24Z",
       "repo": "mukeenanyafiq/recover-theme",
       "version": "1.0.70"
+    },
+    {
+      "commit": "81e20d8545668eea7bc0a37e5f11dcc8e7cbd6bf",
+      "id": "dynamic-background",
+      "integrity": "sha256-4df3e310c4a8f72c9090ce17178954e390681c53efbb6f4675e1f77a1029d2c6",
+      "locked": "2026-01-23T15:28:32Z",
+      "repo": "chengggit/YouTube-Music-Dynamic-Theme",
+      "version": "2.9.9"
     }
   ],
-  "updated": "2026-01-18T18:12:48Z",
+  "updated": "2026-01-23T15:28:32Z",
   "version": 1
 }
