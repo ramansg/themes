@@ -1,25 +1,25 @@
-# Better Lyrics – Minimal Immersive Theme (v1.6.13)
+# Better Lyrics – Minimal Immersive Theme (v1.6.17)
 
 A clean, performance-focused theme for the **Better Lyrics** extension on **YouTube Music**.
 
-Optimized to use minimal resources for portrait view. & many quality of life changes.
+Optimized for portrait view with minimal resource usage, and packed with quality-of-life refinements.
 
-This theme removes most lyric swipe/word animations and replaces them with a smooth, opacity-based focus system. The result is a calm, immersive, distraction-free lyrics experience with dynamic blurred album art backgrounds.
+This theme removes most lyric swipe and word animations, replacing them with a smooth, opacity-based focus system. The result is a calm, immersive, distraction-free lyrics experience with dynamic blurred album art backgrounds.
 
-> _“Time, Tide, & I wait for nothing.”_
-> 
-> — Boidu _(probably)_
+> "Time, Tide, & I wait for nothing."
+
+— *Boidu (probably)*
 
 ![Performance and Elegance](https://raw.githubusercontent.com/ramansg/Minimal/refs/heads/main/images/2.png)
 
 ## 📖 Table of Contents
-- [✨ Core Philosophy](#-core-philosophy)
+- [✨ Who Is This Theme For?](#-who-is-this-theme-for)
 - [🔤 Typography](#-typography)
 - [🎯 Lyrics Behavior](#-lyrics-behavior)
 - [🚫 Animation Changes](#-animation-changes)
-- [🌌 Background System](#-background-system-section-33)
+- [🌌 Background System](#-background-system)
 - [📱 Fullscreen & Portrait Support](#-fullscreen--portrait-support)
-- [🎵 No Lyrics Experience](#-no-lyrics-experience)
+- [🎵 'No Lyrics Found' Experience](#-no-lyrics-found-experience)
 - [📦 Loader & Ad Overlay](#-loader--ad-overlay)
 - [🎨 UI Enhancements](#-ui-enhancements)
 - [⚙ Performance Notes](#-performance-notes)
@@ -30,13 +30,20 @@ This theme removes most lyric swipe/word animations and replaces them with a smo
 
 ---
 
-## ✨ Core Philosophy
+## ✨ Who Is This Theme For?
 
-- **Minimal motion**
-- **Strong focus on current lyric**
-- **Soft, immersive blurred background**
-- **Consistent typography**
-- **Performance-aware design**
+- Users who dislike flashy lyric animations
+- Users who want a cinematic album-art background
+- Users who prefer readability over motion
+- Users with low-range systems who want better performance
+- Minimalist aesthetic lovers
+
+**Design principles:**
+- Minimal motion
+- Strong focus on current lyric
+- Soft, immersive blurred background
+- Consistent typography
+- Performance-aware design
 
 Animations are intentionally disabled or simplified for a stable and readable experience.
 
@@ -107,15 +114,18 @@ Then control animations via Better Lyrics settings instead.
 
 ---
 
-## 🌌 Background System (Section 3.3)
+## 🌌 Background System
+**(Section 3.3)**
 
-Dynamic album art background with:
+The default Dynamic album art background with:
 
-* Blur: `30px`
-* Brightness: `0.35`
-* Contrast: `0.90`
-* Saturation: configurable
+* Blur: `30px` _(aesthetical and yet recognizable)_
+* Brightness: `0.35` _(lowered brightness for legibility)_
+* Contrast: `0.90` _(lowered contrast for black color differentiation)_
+* Saturation: `1.0` _(neutral — no artificial boost)_
 * Smooth transition delay
+
+You can change the values in accordance to your preference
 
 Performance Tip:
 Lower this value for better performance:
@@ -150,7 +160,7 @@ Portrait mode:
 
 ---
 
-## 🎵 No Lyrics Experience
+## 🎵 'No Lyrics Found' Experience
 
 If synced lyrics aren’t found:
 
@@ -185,10 +195,14 @@ Includes refined styling and layout fixes to match the immersive dark aesthetic:
 ![Miscellaneous Touches - QoL](https://raw.githubusercontent.com/ramansg/Minimal/refs/heads/main/images/5.png)
 * **Player Queue:** Sticky headers, custom transparent chip designs, and fixed dragging-state backgrounds.
 * **Menus & Popups:** Refined 3-dot menu scroll behavior and compact, rounded volume popups.
-* **Search & Navigation:** Darker search box backgrounds and customized tab headings with underline highlights.
+* **Search & Navigation:** Darker search box backgrounds and customized tab headings with pill-style active indicator.
 * **Notifications:** Auto-dismissing toast notifications that sweep away smoothly.
 * **UI Cleanups:** Hidden scrollbars, transparent player bars, and removed gradient overlays.
 * **Progress Bar & Controls:** Added smooth movement to the progress bar. Improved aesthetic of floating timestamps-tooltip.
+* **Superellipse Corner Shaping:** All UI surfaces — album art, queue items, menus, toasts, volume popup, progress knob, and tabs — now use `corner-shape: superellipse` for a consistent squircle aesthetic.
+* **Sidebar Navigation:** Guide items styled with subtle opacity and hover highlight for a cleaner sidebar feel.
+* **Audio/Video Toggle (Section 33):** Restyled A/V toggle with transparent background, opacity-based visibility, and contextual fullscreen variant.
+* **Player Controls (Section 34):** Play/pause button has a subtle filled background. Skip, seek, shuffle, repeat, and icon buttons are opacity-dimmed by default with a highlight ring on hover.
 
 ---
 
@@ -209,33 +223,8 @@ This theme is built to be visually rich without relying on heavy animation logic
 Most quick edits are inside **Section 3**:
 
 * **Section 3.1 & 3.2:** Tweak font sizes, weights, scroll timing, and lyric opacity levels.
-* **Section 3.3:** Adjust background blur, saturation, brightness, and contrast. 
+* **Section 3.3:** Adjust background blur, saturation, brightness, and contrast.
 * **Section 3.4:** The whole theme relies on the custom variables of oklch colors. Altering these may break parts of the theme configuration.
-
----
-
-## 🐞 Reporting Issues
-
-Please report bugs or suggestions on Discord.
-
----
-
-## 🔖 Version
-
-**v1.6.13**
-Last updated: 2026-03-13
-
----
-
-## 💡 Who Is This Theme For?
-
-* Users who dislike flashy lyric animations
-* Users who want a cinematic album-art background
-* Users who prefer readability over motion
-* Users with low-range systems who want better performance
-* Minimalist aesthetic lovers
-
----
 
 If you want:
 
@@ -245,9 +234,11 @@ If you want:
 
 ---
 
-Enjoy the calm.
+## 🔖 Version
 
----
+**v1.6.17** — Last updated: 2026-05-21
+
+Please report bugs or suggestions on the Better Lyrics Discord.
 
 ---
 
@@ -258,8 +249,10 @@ If you prefer using the default Better Lyrics theme but just want to cherry-pick
 ### 1. Opacity-Scroll Lyric Animation
 *Replaces default karaoke styles, wobbles, and glows with smooth, opacity-based scrolling.*
 
-```css
+<details>
+<summary>Show CSS</summary>
 
+```css
 :root {
   --current-lyric-visibility: 1;
   /* 1 would mean 100%   */
@@ -472,11 +465,15 @@ ytmusic-app-layout:not([is-mweb-modernization-enabled]) [player-fullscreened]:no
 .blyrics-container>div>div>span>span.blyrics--animating {
   animation: none;
 }
-
 ```
 
+</details>
+
 ### 2. Optional Musical Note Plugins
-*(Optional) To disable musical note animation*
+#### Disable musical note animation
+
+<details>
+<summary>Show CSS</summary>
 
 ```css
 .blyrics--instrumental-icon {
@@ -487,7 +484,11 @@ ytmusic-app-layout:not([is-mweb-modernization-enabled]) [player-fullscreened]:no
 }
 ```
 
-*(Optional) to replace all breaks with musical notes*
+</details>
+
+#### Replace all breaks with musical notes
+<details>
+<summary>Show CSS</summary>
 
 ```css
 .blyrics--line:has(.blyrics--word[data-content=""]) .blyrics--break {
@@ -501,3 +502,5 @@ ytmusic-app-layout:not([is-mweb-modernization-enabled]) [player-fullscreened]:no
   visibility: visible;
 }
 ```
+
+</details>
