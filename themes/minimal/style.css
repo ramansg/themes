@@ -1,30 +1,32 @@
 
-/* 2026-05-25T18-32-30 v1.6.173                     */
+/* 2026-05-30T18-22-38 v1.6.174                     */
 
 /* Install from Theme Marketplace to always have    */ 
-/* the latest version!                              */
+/*   the latest version!                            */
+
+/* Report bugs, suggestions and performance issues  */
+/*   the better-lyrics discord.                     */
 
 /* This theme explicitly changes/disables lyrics    */
-/* swipe animation. To bring back default lyric     */ 
-/* animation & style into this theme, delete all of */ 
-/* the following -                                  */ 
-/* Section-2-font-family-line, 3.1, 3.2, 4, 6, & 25 */ 
+/*   swipe animation. To bring back default lyric   */ 
+/*   animation & styles, delete all of              */
+/*   the following - Section-2-font-family-line,    */
+/*   3.1, 3.2, 4, 6, & 25                           */ 
 
 /* You can then control stylized animations from    */
-/* extension settings like other themes.            */
+/*   extension settings like other themes.          */
 
 /* Previous/Next/Current lyrics' visibility can be  */
-/* changed easily from Section-3.1                  */
+/*   changed easily from Section-3.1                */
 
 /* Section 3.3 has all the set background effects.  */
 
 /* Lower blur value gives higher performance.       */
 
 /* The background can be can be completely disabled */
-/* from extension settings for better performance.  */
+/*   from extension settings for better performance.*/
 
-/* please report all bugs and suggestions on discord*/
-/* _Time, Tide, & I wait for nothing- boidu_ (maybe)*/
+/*-Time, Tide, & I wait for nothing - boidu (maybe)-*/
 
 
 /* ## SECTION-1 - Custom Font URL ################# */
@@ -678,9 +680,100 @@ ytmusic-browse-response[has-background]:not([disable-gradient])
   opacity: 1;
 }
 
-/* ## SECTION-17 - Search-box background ########## */
+/* ## SECTION-17 - Search Box ##################### */
 ytmusic-search-box[is-bauhaus-sidenav-enabled] {
-  --ytmusic-search-background: #212121;
+  --ytmusic-search-border: var(--white-dot-10);
+  --ytmusic-search-background: oklch(from #212121 l c h);
+
+  /* Input field — smooth background transition */
+  & .search-box.ytmusic-search-box {
+    transition: background-color 0.2s var(--transition-curve);
+  }
+
+  /* Suggestion list — fade in/out transition */
+  & #suggestion-list {
+    transition-duration: 0.35s;
+    transition-property: opacity;
+    transition-timing-function: var(--transition-curve);
+
+    /* Bottom pill shape when suggestions are visible */
+    &.ytmusic-search-box {
+      border-radius: 0 0 20px 20px;
+      corner-shape: superellipse(2);
+    }
+  }
+
+  /* Closed / collapsed state */
+  &:not([opened]) {
+    /* Pill-shaped outer container */
+    & .search-container.ytmusic-search-box {
+      border-radius: 20px;
+      corner-shape: superellipse(2);
+    }
+
+    /* Hide suggestion list when closed */
+    & #suggestion-list {
+      opacity: 0;
+    }
+
+    /* Idle — no query has been typed */
+    &:not([has-query]) {
+      opacity: 0.7;
+      transition: opacity 0.2s var(--transition-curve);
+
+      &:hover {
+        opacity: 1;
+      }
+
+      & .search-box.ytmusic-search-box {
+        background: var(--white-dot-10);
+        border-radius: 20px;
+        corner-shape: superellipse(2);
+      }
+    }
+  }
+
+  /* Query typed — remove container shadow */
+  &[has-query] .search-container.ytmusic-search-box {
+    box-shadow: none;
+  }
+
+  /* Expanded, suggestions not yet loaded */
+  &[opened]:not(:has(ytmusic-search-suggestions-section)) {
+    & #suggestion-list {
+      opacity: 0;
+    }
+
+    & .search-box.ytmusic-search-box {
+      border-radius: 20px;
+      corner-shape: superellipse(2);
+    }
+  }
+
+  /* Expanded with suggestions — flat bottom edge */
+  &[opened]:has(ytmusic-search-suggestions-section) .search-box.ytmusic-search-box {
+    border-radius: 20px 20px 0 0;
+    corner-shape: superellipse(2);
+  }
+}
+
+/* Remove shadow on any opened search box */
+ytmusic-search-box[opened] .search-container.ytmusic-search-box {
+  box-shadow: none;
+}
+
+/* Suggestion result text colour */
+ytmusic-search-suggestion {
+  color: var(--white-dot-87);
+}
+
+/* Suggestion hover and selected states */
+#suggestions.ytmusic-search-suggestions-section
+  > .ytmusic-search-suggestions-section:is(.hover, .selected-suggestion, :hover) {
+  background-color: var(--white-dot-10);
+  box-shadow: inset 0 0 0px 1px var(--white-dot-10);
+  border-radius: 20px;
+  corner-shape: superellipse(2);
 }
 
 /* ## SECTION-18 - 3button menu design ############ */
@@ -721,6 +814,14 @@ ytmusic-popup-container #contentWrapper {
   width: max-content !important;
   max-height: 100% !important;
   pointer-events: auto !important;
+}
+
+/* Menu popup item hover */
+#items.ytmusic-menu-popup-renderer > .ytmusic-menu-popup-renderer:hover {
+  background-color: var(--white-dot-10);
+  box-shadow: inset 0 0 0px 1px var(--white-dot-10);
+  border-radius: 13.92px;
+  corner-shape: superellipse(2);
 }
 
 /* ## SECTION-19 - Player Queue Header ############ */
@@ -1197,9 +1298,37 @@ ytmusic-player-page[is-mweb-modernization-enabled]
   content: "No lyrics found";
 }
 
-/* ### Section 30 - Smooth sidebar entry ########## */
+/* ### Section 30 - Layout & Navigation Transitions */
+#content-wrapper {
+  transition-duration: 0.7s;
+  transition-property: margin;
+  transition-timing-function: var(--transition-curve);
+}
+
 #contentContainer {
-  transition: transform 0.2s var(--transition-curve) !important;
+  transition-duration: 0.35s !important;
+  transition-property: visibility, width, transform;
+  transition-timing-function: var(--transition-curve);
+}
+
+ytmusic-player-page#player-page {
+  transition-duration: 0.35s, 0.35s, 0.7s !important;
+  transition-property: left, transform, width;
+  transition-timing-function: var(--transition-curve);
+}
+
+.content-container.ytmusic-immersive-header-renderer {
+  transition-duration: 0.7s !important;
+  transition-property: width;
+  transition-timing-function: var(--transition-curve);
+}
+
+#header
+  > ytmusic-immersive-header-renderer
+  > ytmusic-fullbleed-thumbnail-renderer {
+  transition-duration: 1.05s !important;
+  transition-property: margin, transform;
+  transition-timing-function: var(--transition-curve);
 }
 
 tp-yt-paper-item.ytmusic-guide-entry-renderer {
