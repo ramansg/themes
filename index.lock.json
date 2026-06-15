@@ -111,8 +111,16 @@
       "locked": "2026-06-12T22:38:21Z",
       "repo": "better-lyrics/theme-sustain",
       "version": "1.0.0"
+    },
+    {
+      "commit": "2be530c8b4b36c2dc66b6ae13672ac750db0d9df",
+      "id": "apple-music-v3",
+      "integrity": "sha256-a485ba243301a4272077f7a3e764d6fdea3d9a12da312900ad9f12b6a959e5d0",
+      "locked": "2026-06-15T10:38:13Z",
+      "repo": "ankit008-mishra/apple-music-v3",
+      "version": "1.0.0"
     }
   ],
-  "updated": "2026-06-14T11:29:50Z",
+  "updated": "2026-06-15T10:38:13Z",
   "version": 1
 }
