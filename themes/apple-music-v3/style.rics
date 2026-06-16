@@ -10,7 +10,7 @@
 }
 
 :root {
-  --art-size: 480px;
+  --art-size: 420px;
   --lyrics-offset: 80px;
 
   --blyrics-font-family: "MySanFrancisco", "SF Pro", system-ui, -apple-system, sans-serif;
@@ -322,7 +322,7 @@ ytmusic-player-page[player-fullscreened] #player {
 .blyrics-container>.blyrics--line.blyrics--active {
   opacity: 1 !important;
   font-weight: 700 !important;
-  transform: scale(1.04) !important;
+  transform: scale(1.14) !important;
   filter: blur(0px) !important; 
   text-shadow: 0px 10px 25px rgba(0, 0, 0, 0.55) !important; 
 }
